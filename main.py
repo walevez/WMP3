@@ -132,6 +132,41 @@ def descargar_mp3(url, carpeta_destino="downloads", progress_callback=None, stat
 
 # --- Interfaz Gráfica de Usuario (GUI) con Tkinter ---
 
+def set_app_icon(window, icon_path=None):
+    """
+    Cambia el icono de la ventana principal de la aplicación.
+    Si icon_path es None, no hace nada.
+    """
+    if not icon_path:
+        return
+    if not os.path.exists(icon_path):
+        try:
+            from tkinter import messagebox
+            messagebox.showwarning("Icono no encontrado", f"No se encontró el icono en: {icon_path}\nLa aplicación funcionará sin icono personalizado.")
+        except Exception:
+            print(f"Advertencia: No se encontró el icono en: {icon_path}")
+        return
+    try:
+        # Para Windows, usar .ico
+        window.iconbitmap(icon_path)
+    except Exception as e:
+        try:
+            # Si falla, intentar con PhotoImage (.png)
+            img = tk.PhotoImage(file=icon_path)
+            window.iconphoto(True, img)
+        except Exception as e2:
+            try:
+                from tkinter import messagebox
+                messagebox.showwarning("Error de icono", f"No se pudo establecer el icono personalizado.\nError: {e}\n{e2}")
+            except Exception:
+                print(f"No se pudo establecer el icono personalizado. Error: {e} {e2}")
+
+# --- Cambiar el icono de la aplicación ---
+ICON_PATH = os.path.join(os.getcwd(), "sources", "icon.ico")  # Cambia la ruta si tu icono está en otro lugar
+
+def set_icon_on_root(root):
+    set_app_icon(root, ICON_PATH)
+
 class YtMp3DownloaderApp:
     def __init__(self, master):
         self.master = master
@@ -333,5 +368,6 @@ class YtMp3DownloaderApp:
 # --- Punto de entrada de la aplicación ---
 if __name__ == "__main__":
     root = tk.Tk()
+    set_icon_on_root(root)  # Asegura que el icono se aplique antes de mostrar la ventana
     app = YtMp3DownloaderApp(root)
     root.mainloop()
